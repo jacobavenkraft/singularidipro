@@ -1,0 +1,19 @@
+{
+    "name": "Singularidi.Editor",
+    "rootNamespace": "Singularidi.Editor",
+    "references": [
+        "Singularidi.Core",
+        "Singularidi.Unity"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
