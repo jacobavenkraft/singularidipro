@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>MeltySynth</id>
+    <version>2.4.1</version>
+    <authors>Nobuaki Tanaka</authors>
+    <license type="file">LICENSE.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <projectUrl>https://github.com/sinshu/meltysynth/</projectUrl>
+    <description>A SoundFont MIDI synthesizer for .NET</description>
+    <releaseNotes>https://github.com/sinshu/meltysynth/blob/main/CHANGELOG.md</releaseNotes>
+    <tags>audio soundfont synthesizer midi</tags>
+    <repository type="git" url="https://github.com/sinshu/meltysynth/" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.1" />
+    </dependencies>
+  </metadata>
+</package>

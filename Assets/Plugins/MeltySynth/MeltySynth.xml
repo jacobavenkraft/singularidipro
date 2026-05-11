@@ -1,0 +1,768 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MeltySynth</name>
+    </assembly>
+    <members>
+        <member name="T:MeltySynth.AudioRendererEx">
+            <summary>
+            Provides utility methods to convert the format of samples.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.AudioRendererEx.RenderInterleaved(MeltySynth.IAudioRenderer,System.Span{System.Single})">
+            <summary>
+            Renders the waveform as a stereo interleaved signal.
+            </summary>
+            <param name="renderer">The audio renderer.</param>
+            <param name="destination">The destination buffer.</param>
+            <remarks>
+            This utility method internally uses <see cref="T:System.Buffers.ArrayPool`1"/>,
+            which may result in memory allocation on the first call.
+            To completely avoid memory allocation,
+            use <see cref="M:MeltySynth.IAudioRenderer.Render(System.Span{System.Single},System.Span{System.Single})"/>.
+            </remarks>
+        </member>
+        <member name="M:MeltySynth.AudioRendererEx.RenderMono(MeltySynth.IAudioRenderer,System.Span{System.Single})">
+            <summary>
+            Renders the waveform as a monaural signal.
+            </summary>
+            <param name="renderer">The audio renderer.</param>
+            <param name="destination">The destination buffer.</param>
+            <remarks>
+            This utility method internally uses <see cref="T:System.Buffers.ArrayPool`1"/>,
+            which may result in memory allocation on the first call.
+            To completely avoid memory allocation,
+            use <see cref="M:MeltySynth.IAudioRenderer.Render(System.Span{System.Single},System.Span{System.Single})"/>.
+            </remarks>
+        </member>
+        <member name="M:MeltySynth.AudioRendererEx.RenderInt16(MeltySynth.IAudioRenderer,System.Span{System.Int16},System.Span{System.Int16})">
+            <summary>
+            Renders the waveform with 16-bit quantization.
+            </summary>
+            <param name="renderer">The audio renderer.</param>
+            <param name="left">The buffer of the left channel to store the rendered waveform.</param>
+            <param name="right">The buffer of the right channel to store the rendered waveform.</param>
+            <remarks>
+            Out of range samples will be clipped.
+            This utility method internally uses <see cref="T:System.Buffers.ArrayPool`1"/>,
+            which may result in memory allocation on the first call.
+            To completely avoid memory allocation,
+            use <see cref="M:MeltySynth.IAudioRenderer.Render(System.Span{System.Single},System.Span{System.Single})"/>.
+            The output buffers for the left and right must be the same length.
+            </remarks>
+        </member>
+        <member name="M:MeltySynth.AudioRendererEx.RenderInterleavedInt16(MeltySynth.IAudioRenderer,System.Span{System.Int16})">
+            <summary>
+            Renders the waveform as a stereo interleaved signal with 16-bit quantization.
+            </summary>
+            <param name="renderer">The audio renderer.</param>
+            <param name="destination">The destination buffer.</param>
+            <remarks>
+            Out of range samples will be clipped.
+            This utility method internally uses <see cref="T:System.Buffers.ArrayPool`1"/>,
+            which may result in memory allocation on the first call.
+            To completely avoid memory allocation,
+            use <see cref="M:MeltySynth.IAudioRenderer.Render(System.Span{System.Single},System.Span{System.Single})"/>.
+            </remarks>
+        </member>
+        <member name="M:MeltySynth.AudioRendererEx.RenderMonoInt16(MeltySynth.IAudioRenderer,System.Span{System.Int16})">
+            <summary>
+            Renders the waveform as a monaural signal with 16-bit quantization.
+            </summary>
+            <param name="renderer">The audio renderer.</param>
+            <param name="destination">The destination buffer.</param>
+            <remarks>
+            Out of range samples will be clipped.
+            This utility method internally uses <see cref="T:System.Buffers.ArrayPool`1"/>,
+            which may result in memory allocation on the first call.
+            To completely avoid memory allocation,
+            use <see cref="M:MeltySynth.IAudioRenderer.Render(System.Span{System.Single},System.Span{System.Single})"/>.
+            </remarks>
+        </member>
+        <member name="T:MeltySynth.IAudioRenderer">
+            <summary>
+            Defines a common interface for audio rendering.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.IAudioRenderer.Render(System.Span{System.Single},System.Span{System.Single})">
+            <summary>
+            Renders the waveform.
+            </summary>
+            <param name="left">The buffer of the left channel to store the rendered waveform.</param>
+            <param name="right">The buffer of the right channel to store the rendered waveform.</param>
+            <remarks>
+            The output buffers for the left and right must be the same length.
+            </remarks>
+        </member>
+        <member name="T:MeltySynth.Instrument">
+            <summary>
+            Represents an instrument in the SoundFont.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.Instrument.ToString">
+            <summary>
+            Gets the name of the instrument.
+            </summary>
+            <returns>
+            The name of the instrument.
+            </returns>
+        </member>
+        <member name="P:MeltySynth.Instrument.Name">
+            <summary>
+            The name of the instrument.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Instrument.Regions">
+            <summary>
+            The regions of the instrument.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.InstrumentRegion">
+            <summary>
+            Represents an instrument region.
+            </summary>
+            <remarks>
+            An instrument region contains all the parameters necessary to synthesize a note.
+            </remarks>
+        </member>
+        <member name="M:MeltySynth.InstrumentRegion.Contains(System.Int32,System.Int32)">
+            <summary>
+            Checks if the region covers the given key and velocity.
+            </summary>
+            <param name="key">The key of a note.</param>
+            <param name="velocity">The velocity of a note.</param>
+            <returns>
+            <c>true</c> if the region covers the given key and velocity.
+            </returns>
+        </member>
+        <member name="M:MeltySynth.InstrumentRegion.ToString">
+            <summary>
+            Gets the string representation of the region.
+            </summary>
+            <returns>
+            The string representation of the region.
+            </returns>
+        </member>
+        <member name="P:MeltySynth.InstrumentRegion.Sample">
+            <summary>
+            The sample corresponding to the region.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.LoopMode">
+            <summary>
+            Specifies how the synthesizer loops the sample.
+            </summary>
+        </member>
+        <member name="F:MeltySynth.LoopMode.NoLoop">
+            <summary>
+            The sample will be played without loop.
+            </summary>
+        </member>
+        <member name="F:MeltySynth.LoopMode.Continuous">
+            <summary>
+            The sample will continuously loop.
+            </summary>
+        </member>
+        <member name="F:MeltySynth.LoopMode.LoopUntilNoteOff">
+            <summary>
+            The sample will loop until the note stops.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.MidiFile">
+            <summary>
+            Represents a standard MIDI file.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.MidiFile.#ctor(System.IO.Stream)">
+            <summary>
+            Loads a MIDI file from the stream.
+            </summary>
+            <param name="stream">The data stream used to load the MIDI file.</param>
+        </member>
+        <member name="M:MeltySynth.MidiFile.#ctor(System.IO.Stream,System.Int32)">
+            <summary>
+            Loads a MIDI file from the stream.
+            </summary>
+            <param name="stream">The data stream used to load the MIDI file.</param>
+            <param name="loopPoint">The loop start point in ticks.</param>
+        </member>
+        <member name="M:MeltySynth.MidiFile.#ctor(System.IO.Stream,MeltySynth.MidiFileLoopType)">
+            <summary>
+            Loads a MIDI file from the stream.
+            </summary>
+            <param name="stream">The data stream used to load the MIDI file.</param>
+            <param name="loopType">The type of the loop extension to be used.</param>
+        </member>
+        <member name="M:MeltySynth.MidiFile.#ctor(System.String)">
+            <summary>
+            Loads a MIDI file from the file.
+            </summary>
+            <param name="path">The MIDI file name and path.</param>
+        </member>
+        <member name="M:MeltySynth.MidiFile.#ctor(System.String,System.Int32)">
+            <summary>
+            Loads a MIDI file from the file.
+            </summary>
+            <param name="path">The MIDI file name and path.</param>
+            <param name="loopPoint">The loop start point in ticks.</param>
+        </member>
+        <member name="M:MeltySynth.MidiFile.#ctor(System.String,MeltySynth.MidiFileLoopType)">
+            <summary>
+            Loads a MIDI file from the file.
+            </summary>
+            <param name="path">The MIDI file name and path.</param>
+            <param name="loopType">The type of the loop extension to be used.</param>
+        </member>
+        <member name="P:MeltySynth.MidiFile.Length">
+            <summary>
+            The length of the MIDI file.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.MidiFileLoopType">
+            <summary>
+            Specifies the non-standard loop extension for MIDI files.
+            </summary>
+        </member>
+        <member name="F:MeltySynth.MidiFileLoopType.None">
+            <summary>
+            No special loop extension.
+            </summary>
+        </member>
+        <member name="F:MeltySynth.MidiFileLoopType.RpgMaker">
+            <summary>
+            The RPG Maker style loop.
+            CC #111 will be the loop start point.
+            </summary>
+        </member>
+        <member name="F:MeltySynth.MidiFileLoopType.IncredibleMachine">
+            <summary>
+            The Incredible Machine style loop.
+            CC #110 and #111 will be the loop start point and end point, respectively.
+            </summary>
+        </member>
+        <member name="F:MeltySynth.MidiFileLoopType.FinalFantasy">
+            <summary>
+            The Final Fantasy style loop.
+            CC #116 and #117 will be the loop start point and end point, respectively.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.MidiFileSequencer">
+            <summary>
+            An instance of the MIDI file sequencer.
+            </summary>
+            <remarks>
+            Note that this class does not provide thread safety.
+            If you want to do playback control and render the waveform in separate threads,
+            you must ensure that the methods will not be called simultaneously.
+            </remarks>
+        </member>
+        <member name="M:MeltySynth.MidiFileSequencer.#ctor(MeltySynth.Synthesizer)">
+            <summary>
+            Initializes a new instance of the sequencer.
+            </summary>
+            <param name="synthesizer">The synthesizer to be handled by the sequencer.</param>
+        </member>
+        <member name="M:MeltySynth.MidiFileSequencer.Play(MeltySynth.MidiFile,System.Boolean)">
+            <summary>
+            Plays the MIDI file.
+            </summary>
+            <param name="midiFile">The MIDI file to be played.</param>
+            <param name="loop">If <c>true</c>, the MIDI file loops after reaching the end.</param>
+        </member>
+        <member name="M:MeltySynth.MidiFileSequencer.Stop">
+            <summary>
+            Stop playing.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.MidiFileSequencer.Render(System.Span{System.Single},System.Span{System.Single})">
+            <inheritdoc/>
+        </member>
+        <member name="P:MeltySynth.MidiFileSequencer.Synthesizer">
+            <summary>
+            Gets the synthesizer handled by the sequencer.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.MidiFileSequencer.Position">
+            <summary>
+            Gets the current playback position.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.MidiFileSequencer.EndOfSequence">
+            <summary>
+            Gets a value that indicates whether the current playback position is at the end of the sequence.
+            </summary>
+            <remarks>
+            If the <see cref="M:MeltySynth.MidiFileSequencer.Play(MeltySynth.MidiFile,System.Boolean)">Play</see> method has not yet been called, this value is true.
+            This value will never be <c>true</c> if loop playback is enabled.
+            </remarks>
+        </member>
+        <member name="P:MeltySynth.MidiFileSequencer.Speed">
+            <summary>
+            Gets or sets the playback speed.
+            </summary>
+            <remarks>
+            The default value is 1.
+            The tempo will be multiplied by this value.
+            </remarks>
+        </member>
+        <member name="P:MeltySynth.MidiFileSequencer.OnSendMessage">
+            <summary>
+            Gets or sets the method to alter MIDI messages during playback.
+            If null, MIDI messages will be sent to the synthesizer without any change.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.MidiFileSequencer.MessageHook">
+            <summary>
+            Represents the method that is called each time a MIDI message is processed during playback.
+            </summary>
+            <param name="synthesizer">The synthesizer handled by the sequencer.</param>
+            <param name="channel">The channel to which the message will be sent.</param>
+            <param name="command">The type of the message.</param>
+            <param name="data1">The first data part of the message.</param>
+            <param name="data2">The second data part of the message.</param>
+        </member>
+        <member name="T:MeltySynth.Preset">
+            <summary>
+            Represents a preset in the SoundFont.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.Preset.ToString">
+            <summary>
+            Gets the name of the preset.
+            </summary>
+            <returns>
+            The name of the preset.
+            </returns>
+        </member>
+        <member name="P:MeltySynth.Preset.Name">
+            <summary>
+            The name of the preset.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Preset.PatchNumber">
+            <summary>
+            The patch number of the preset.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Preset.BankNumber">
+            <summary>
+            The bank number of the preset.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Preset.Regions">
+            <summary>
+            The regions of the preset.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.PresetRegion">
+            <summary>
+            Represents a preset region.
+            </summary>
+            <remarks>
+            A preset region indicates how the parameters of the instrument should be modified in the preset.
+            </remarks>
+        </member>
+        <member name="M:MeltySynth.PresetRegion.Contains(System.Int32,System.Int32)">
+            <summary>
+            Checks if the region covers the given key and velocity.
+            </summary>
+            <param name="key">The key of a note.</param>
+            <param name="velocity">The velocity of a note.</param>
+            <returns>
+            <c>true</c> if the region covers the given key and velocity.
+            </returns>
+        </member>
+        <member name="M:MeltySynth.PresetRegion.ToString">
+            <summary>
+            Gets the string representation of the region.
+            </summary>
+            <returns>
+            The string representation of the region.
+            </returns>
+        </member>
+        <member name="P:MeltySynth.PresetRegion.Instrument">
+            <summary>
+            The instrument corresponding to the region.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.SampleHeader">
+            <summary>
+            Represents a sample in the SoundFont.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.SampleHeader.ToString">
+            <summary>
+            Gets the name of the sample.
+            </summary>
+            <returns>
+            The name of the sample.
+            </returns>
+        </member>
+        <member name="P:MeltySynth.SampleHeader.Name">
+            <summary>
+            The name of the sample.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SampleHeader.Start">
+            <summary>
+            The start point of the sample in the sample data.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SampleHeader.End">
+            <summary>
+            The end point of the sample in the sample data.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SampleHeader.StartLoop">
+            <summary>
+            The loop start point of the sample in the sample data.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SampleHeader.EndLoop">
+            <summary>
+            The loop end point of the sample in the sample data.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SampleHeader.SampleRate">
+            <summary>
+            The sample rate of the sample.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SampleHeader.OriginalPitch">
+            <summary>
+            The key number of the recorded pitch of the sample.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SampleHeader.PitchCorrection">
+            <summary>
+            The pitch correction in cents that should be applied to the sample on playback.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.SoundFont">
+            <summary>
+            Reperesents a SoundFont.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.SoundFont.#ctor(System.IO.Stream)">
+            <summary>
+            Loads a SoundFont from the stream.
+            </summary>
+            <param name="stream">
+            The data stream used to load the SoundFont.
+            </param>
+        </member>
+        <member name="M:MeltySynth.SoundFont.#ctor(System.String)">
+            <summary>
+            Loads a SoundFont from the file.
+            </summary>
+            <param name="path">
+            The SoundFont file name and path.
+            </param>
+        </member>
+        <member name="M:MeltySynth.SoundFont.ToString">
+            <summary>
+            Gets the name of the SoundFont.
+            </summary>
+            <returns>
+            The name of the SoundFont.
+            </returns>
+        </member>
+        <member name="P:MeltySynth.SoundFont.Info">
+            <summary>
+            The information of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFont.BitsPerSample">
+            <summary>
+            The bits per sample of the sample data.
+            </summary>
+            <remarks>
+            This value is always 16.
+            </remarks>
+        </member>
+        <member name="P:MeltySynth.SoundFont.WaveData">
+            <summary>
+            The sample data.
+            </summary>
+            <remarks>
+            This single array contains all the waveform data in the SoundFont.
+            An instance of <see cref="T:MeltySynth.SampleHeader"/> indicates a range of the array corresponding to a sample.
+            </remarks>
+        </member>
+        <member name="P:MeltySynth.SoundFont.SampleHeaders">
+            <summary>
+            The samples of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFont.Presets">
+            <summary>
+            The presets of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFont.Instruments">
+            <summary>
+            The instruments of the SoundFont.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.SoundFontInfo">
+            <summary>
+            The information of a SoundFont.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.SoundFontInfo.ToString">
+            <summary>
+            Gets the name of the SoundFont.
+            </summary>
+            <returns>
+            The name of the SoundFont.
+            </returns>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.Version">
+            <summary>
+            The version of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.TargetSoundEngine">
+            <summary>
+            The target sound engine of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.BankName">
+            <summary>
+            The bank name of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.RomName">
+            <summary>
+            The ROM name of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.RomVersion">
+            <summary>
+            The ROM version of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.CeationDate">
+            <summary>
+            The creation date of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.Author">
+            <summary>
+            The auther of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.TargetProduct">
+            <summary>
+            The target product of the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.Copyright">
+            <summary>
+            The copyright message for the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.Comments">
+            <summary>
+            The comments for the SoundFont.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontInfo.Tools">
+            <summary>
+            The tools used to create the SoundFont.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.SoundFontVersion">
+            <summary>
+            Reperesents the version of a SoundFont.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.SoundFontVersion.ToString">
+            <summary>
+            Gets the string representation of the version.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:MeltySynth.SoundFontVersion.Major">
+            <summary>
+            The major version.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SoundFontVersion.Minor">
+            <summary>
+            The minor version.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.Synthesizer">
+            <summary>
+            An instance of the SoundFont synthesizer.
+            </summary>
+            <remarks>
+            Note that this class does not provide thread safety.
+            If you want to send notes and render the waveform in separate threads,
+            you must ensure that the methods will not be called simultaneously.
+            </remarks>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.#ctor(System.String,System.Int32)">
+            <summary>
+            Initializes a new synthesizer using a specified SoundFont and sample rate.
+            </summary>
+            <param name="soundFontPath">The SoundFont file name and path.</param>
+            <param name="sampleRate">The sample rate for synthesis.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.#ctor(MeltySynth.SoundFont,System.Int32)">
+            <summary>
+            Initializes a new synthesizer using a specified SoundFont and sample rate.
+            </summary>
+            <param name="soundFont">The SoundFont instance.</param>
+            <param name="sampleRate">The sample rate for synthesis.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.#ctor(System.String,MeltySynth.SynthesizerSettings)">
+            <summary>
+            Initializes a new synthesizer using a specified SoundFont and settings.
+            </summary>
+            <param name="soundFontPath">The SoundFont file name and path.</param>
+            <param name="settings">The settings for synthesis.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.#ctor(MeltySynth.SoundFont,MeltySynth.SynthesizerSettings)">
+            <summary>
+            Initializes a new synthesizer using a specified SoundFont and settings.
+            </summary>
+            <param name="soundFont">The SoundFont instance.</param>
+            <param name="settings">The settings for synthesis.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.ProcessMidiMessage(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Processes a MIDI message.
+            </summary>
+            <param name="channel">The channel to which the message will be sent.</param>
+            <param name="command">The type of the message.</param>
+            <param name="data1">The first data part of the message.</param>
+            <param name="data2">The second data part of the message.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.NoteOff(System.Int32,System.Int32)">
+            <summary>
+            Stops a note.
+            </summary>
+            <param name="channel">The channel of the note.</param>
+            <param name="key">The key of the note.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.NoteOn(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Starts a note.
+            </summary>
+            <param name="channel">The channel of the note.</param>
+            <param name="key">The key of the note.</param>
+            <param name="velocity">The velocity of the note.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.NoteOffAll(System.Boolean)">
+            <summary>
+            Stops all the notes.
+            </summary>
+            <param name="immediate">If <c>true</c>, notes will stop immediately without the release sound.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.NoteOffAll(System.Int32,System.Boolean)">
+            <summary>
+            Stops all the notes in the specified channel.
+            </summary>
+            <param name="channel">The channel in which the notes will be stopped.</param>
+            <param name="immediate">If <c>true</c>, notes will stop immediately without the release sound.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.ResetAllControllers">
+            <summary>
+            Resets all the controllers.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.ResetAllControllers(System.Int32)">
+            <summary>
+            Resets all the controllers of the specified channel.
+            </summary>
+            <param name="channel">The channel to be reset.</param>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.Reset">
+            <summary>
+            Resets the synthesizer.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.Synthesizer.Render(System.Span{System.Single},System.Span{System.Single})">
+            <inheritdoc/>
+        </member>
+        <member name="P:MeltySynth.Synthesizer.BlockSize">
+            <summary>
+            The block size for rendering waveform.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Synthesizer.MaximumPolyphony">
+            <summary>
+            The number of maximum polyphony.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Synthesizer.ChannelCount">
+            <summary>
+            The number of channels.
+            </summary>
+            <remarks>
+            This value is always 16.
+            </remarks>
+        </member>
+        <member name="P:MeltySynth.Synthesizer.PercussionChannel">
+            <summary>
+            The percussion channel.
+            </summary>
+            <remarks>
+            This value is always 9.
+            </remarks>
+        </member>
+        <member name="P:MeltySynth.Synthesizer.SoundFont">
+            <summary>
+            The SoundFont used as the audio source.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Synthesizer.SampleRate">
+            <summary>
+            The sample rate for synthesis.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Synthesizer.ActiveVoiceCount">
+            <summary>
+            The number of voices currently being played.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.Synthesizer.MasterVolume">
+            <summary>
+            Gets or sets the master volume.
+            </summary>
+        </member>
+        <member name="T:MeltySynth.SynthesizerSettings">
+            <summary>
+            Specifies a set of parameters for synthesis.
+            </summary>
+        </member>
+        <member name="M:MeltySynth.SynthesizerSettings.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of synthesizer settings.
+            </summary>
+            <param name="sampleRate">The sample rate for synthesis.</param>
+        </member>
+        <member name="P:MeltySynth.SynthesizerSettings.SampleRate">
+            <summary>
+            Gets or sets the sample rate for synthesis.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SynthesizerSettings.BlockSize">
+            <summary>
+            Gets or sets the block size for rendering waveform.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SynthesizerSettings.MaximumPolyphony">
+            <summary>
+            Gets or sets the number of maximum polyphony.
+            </summary>
+        </member>
+        <member name="P:MeltySynth.SynthesizerSettings.EnableReverbAndChorus">
+            <summary>
+            Gets or sets whether reverb and chorus are enabled.
+            </summary>
+        </member>
+    </members>
+</doc>
