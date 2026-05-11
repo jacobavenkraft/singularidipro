@@ -22,9 +22,11 @@ namespace Singularidi.Unity.Audio
     [RequireComponent(typeof(AudioSource))]
     public sealed class MeltySynthAudioEngine : MonoBehaviour, IAudioEngine
     {
-        // Allocated up-front so OnAudioFilterRead never allocates. Unity's audio buffer is
-        // typically 256–1024 samples; 4096 is a safe ceiling.
-        private const int MaxBufferSamples = 4096;
+        // Scratch buffers allocated up-front so OnAudioFilterRead never allocates.
+        // Size derived from AudioSettings.GetConfiguration().dspBufferSize in Awake; the
+        // OnAudioFilterRead chunk loop also handles oversized data by looping, so this is
+        // a "right-sized common case" optimization rather than a hard upper bound.
+        private const int MinBufferSamples = 256;
 
         private readonly object _synthLock = new object();
 
@@ -32,6 +34,7 @@ namespace Singularidi.Unity.Audio
         private Synthesizer? _synthesizer;
         private AudioSource? _audioSource;
         private int _sampleRate;
+        private int _maxBufferSamples;
 
         private float[]? _leftBuf;
         private float[]? _rightBuf;
@@ -41,13 +44,19 @@ namespace Singularidi.Unity.Audio
         private void Awake()
         {
             _sampleRate = AudioSettings.outputSampleRate;
-            _leftBuf = new float[MaxBufferSamples];
-            _rightBuf = new float[MaxBufferSamples];
+            var audioConfig = AudioSettings.GetConfiguration();
+            _maxBufferSamples = Math.Max(MinBufferSamples, audioConfig.dspBufferSize);
+            _leftBuf = new float[_maxBufferSamples];
+            _rightBuf = new float[_maxBufferSamples];
 
             _audioSource = GetComponent<AudioSource>();
-            ConfigureAudioSourceForFilter(_audioSource);
 
+            // Load the SoundFont BEFORE starting the audio source. AudioSource.Play() inside
+            // ConfigureAudioSourceForFilter can begin invoking OnAudioFilterRead on the audio
+            // thread; if the synth isn't constructed yet, that callback clears its buffer
+            // (correct but wastes a beat). Reordering eliminates the race entirely.
             TryLoadSoundFont();
+            ConfigureAudioSourceForFilter(_audioSource);
         }
 
         private void OnDestroy() => Dispose();
@@ -135,7 +144,7 @@ namespace Singularidi.Unity.Audio
 
             while (offset < totalSamples)
             {
-                int chunk = Math.Min(MaxBufferSamples, totalSamples - offset);
+                int chunk = Math.Min(_maxBufferSamples, totalSamples - offset);
 
                 lock (_synthLock)
                 {

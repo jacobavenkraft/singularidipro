@@ -14,11 +14,13 @@ namespace Singularidi.Unity.Bootstrap
     // Unity audio engine (MeltySynthAudioEngine) with a DspTimeClock as the timing source.
     //
     // The flow each frame:
-    //   1. engine.UpdateNoteEvents() fires NoteTriggered for any note whose StartSeconds has elapsed.
-    //   2. OnNoteTriggered routes NoteOn into the audio engine and queues a (channel, note, endTime)
+    //   1. Detect engine state transitions; on Stop, drop any stale pending releases so the
+    //      next session doesn't fire NoteOff for absolute EndSeconds carried over from before.
+    //   2. engine.UpdateNoteEvents() fires NoteTriggered for any note whose StartSeconds has elapsed.
+    //   3. OnNoteTriggered routes NoteOn into the audio engine and queues a (channel, note, endTime)
     //      record for scheduled release.
-    //   3. After UpdateNoteEvents, we walk the pending-release list and fire NoteOff for anything
-    //      whose endTime has now elapsed.
+    //   4. ProcessPendingReleases walks the list and fires NoteOff for anything whose endTime
+    //      has now elapsed.
     //
     // Phase 5 will replace the pending-release walk with the MidiPreprocessor's per-pitch index.
     // For Phase 2 it's the simplest thing that exercises end-to-end timing + audio.
@@ -32,6 +34,12 @@ namespace Singularidi.Unity.Bootstrap
         [Header("Playback")]
         [SerializeField] private bool _autoPlayOnStart = true;
 
+        [Tooltip("Initial capacity for the pending-release list, sized to expected peak polyphony. " +
+                 "Default 1024 covers Rush E's 897-voice climax. Bump higher for black-MIDI files " +
+                 "with sustained polyphony above 1024 to avoid List<T> reallocations on the " +
+                 "NoteOn hot path.")]
+        [SerializeField] private int _polyphonyBuffer = 1024;
+
         [Header("Diagnostics")]
         [Tooltip("If true, every NoteTriggered is logged with note number + scheduled DSP time.")]
         [SerializeField] private bool _verboseNoteLogging = false;
@@ -41,11 +49,15 @@ namespace Singularidi.Unity.Bootstrap
         private MidiPlaybackEngine? _engine;
 
         // (channel, note, endSeconds) for active notes awaiting release.
-        // List is small (bounded by simultaneous polyphony) and walked once per frame.
-        private readonly List<PendingRelease> _pendingReleases = new List<PendingRelease>(256);
+        // Constructed in Awake with capacity = _polyphonyBuffer (Unity populates SerializeFields
+        // between ctor and Awake, so the field initializer can't see the configured value).
+        // Cleared on Stop transitions so stale absolute EndSeconds don't leak into the next session.
+        private List<PendingRelease> _pendingReleases = null!;
+
+        private PlaybackState _lastObservedState = PlaybackState.Idle;
 
         public MidiPlaybackEngine? Engine => _engine;
-        public IPlaybackClockSnapshot ClockSnapshot => new IPlaybackClockSnapshot(_clock?.NowSeconds ?? 0.0);
+        public ClockSnapshot ClockSnapshot => new ClockSnapshot(_clock?.NowSeconds ?? 0.0);
 
         private void Awake()
         {
@@ -54,6 +66,8 @@ namespace Singularidi.Unity.Bootstrap
             _engine = new MidiPlaybackEngine(_clock, new DryWetMidiFileParser());
             _engine.SetAudioEngine(_audioEngine);
             _engine.NoteTriggered += OnNoteTriggered;
+
+            _pendingReleases = new List<PendingRelease>(Mathf.Max(1, _polyphonyBuffer));
         }
 
         private void Start()
@@ -77,10 +91,28 @@ namespace Singularidi.Unity.Bootstrap
 
         private void Update()
         {
-            if (_engine == null) return;
+            if (_engine == null || _clock == null) return;
 
+            DetectStopAndClearReleases();
             _engine.UpdateNoteEvents();
-            ProcessPendingReleases(_clock!.NowSeconds);
+            ProcessPendingReleases(_clock.NowSeconds);
+        }
+
+        // Detects Playing/Paused -> Loaded/Idle transitions (i.e. an external Stop call) and
+        // drops queued releases. Without this, absolute EndSeconds from the prior session can
+        // satisfy `EndSeconds <= now` on the next Play, firing NoteOff against pitches that
+        // aren't held. Pause does NOT clear (held notes must release correctly on resume).
+        private void DetectStopAndClearReleases()
+        {
+            var state = _engine!.State;
+            if (state == _lastObservedState) return;
+
+            bool wasActive = _lastObservedState == PlaybackState.Playing || _lastObservedState == PlaybackState.Paused;
+            bool nowStopped = state == PlaybackState.Loaded || state == PlaybackState.Idle;
+            if (wasActive && nowStopped && _pendingReleases.Count > 0)
+                _pendingReleases.Clear();
+
+            _lastObservedState = state;
         }
 
         private void OnDestroy()
@@ -130,12 +162,14 @@ namespace Singularidi.Unity.Bootstrap
                 EndSeconds = endSeconds;
             }
         }
+    }
 
-        // Compact snapshot exposed for inspector/debug overlays; avoids exposing the mutable clock.
-        public readonly struct IPlaybackClockSnapshot
-        {
-            public readonly double NowSeconds;
-            public IPlaybackClockSnapshot(double nowSeconds) { NowSeconds = nowSeconds; }
-        }
+    // Compact snapshot exposed for inspector/debug overlays; avoids exposing the mutable clock.
+    // Top-level (not nested in PlaybackHost) so the property `PlaybackHost.ClockSnapshot` can
+    // share the type's identifier without C# member-name collision.
+    public readonly struct ClockSnapshot
+    {
+        public readonly double NowSeconds;
+        public ClockSnapshot(double nowSeconds) { NowSeconds = nowSeconds; }
     }
 }
