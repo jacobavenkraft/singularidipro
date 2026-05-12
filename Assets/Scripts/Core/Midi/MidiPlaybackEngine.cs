@@ -8,7 +8,7 @@ namespace Singularidi.Midi
 {
     public enum PlaybackState { Idle, Loaded, Playing, Paused, Finished }
 
-    public sealed class MidiPlaybackEngine : IDisposable
+    public sealed class MidiPlaybackEngine : IMidiEngine
     {
         private readonly IPlaybackClock _clock;
         private readonly IMidiFileParser _parser;

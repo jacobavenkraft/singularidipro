@@ -14,9 +14,9 @@ namespace Singularidi.Unity.Bootstrap
     //
     // Wires up the Phase 1 Core types (MidiPlaybackEngine + DryWetMidiFileParser) to the Phase 2
     // Unity audio engine (MeltySynthAudioEngine) with a DspTimeClock as the timing source.
-    // Fields hold the platform-agnostic interfaces (IAudioEngine + IPlaybackClock) so that
-    // future backends (e.g. a hardware MIDI-out engine, or a non-DSP clock for headless tests)
-    // can be substituted without touching this host.
+    // Fields hold the platform-agnostic interfaces (IMidiEngine + IAudioEngine + IPlaybackClock)
+    // so that future backends (e.g. a hardware MIDI-out engine, a non-DSP clock for headless
+    // tests, or a scripted IMidiEngine fake) can be substituted without touching this host.
     //
     // The flow each frame:
     //   1. Detect midiEngine state transitions; on Stop, fire NoteOff for every queued release
@@ -52,7 +52,7 @@ namespace Singularidi.Unity.Bootstrap
 
         private IAudioEngine? _audioEngine;
         private IPlaybackClock? _clock;
-        private MidiPlaybackEngine? _midiEngine;
+        private IMidiEngine? _midiEngine;
 
         // (channel, note, endSeconds) for active notes awaiting release.
         // Constructed in Awake with capacity = _polyphonyBuffer (Unity populates SerializeFields
@@ -62,7 +62,7 @@ namespace Singularidi.Unity.Bootstrap
 
         private PlaybackState _lastObservedState = PlaybackState.Idle;
 
-        public MidiPlaybackEngine? Engine => _midiEngine;
+        public IMidiEngine? Engine => _midiEngine;
         public ClockSnapshot ClockSnapshot => new ClockSnapshot(_clock?.NowSeconds ?? 0.0);
 
         private void Awake()
