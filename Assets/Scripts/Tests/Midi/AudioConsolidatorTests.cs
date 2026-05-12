@@ -83,7 +83,7 @@ namespace Singularidi.Tests.Midi
         [Test]
         public void Consolidate_RushE_NeverHasOverlapPerTrackPitch()
         {
-            string path = Path.Combine(Application.dataPath, "Midi", "RushE.mid");
+            string path = Path.Combine(Application.streamingAssetsPath, "Midi", "RushE.mid");
             if (!File.Exists(path))
                 Assert.Inconclusive($"RushE.mid not found at {path}");
 

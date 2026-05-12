@@ -10,7 +10,7 @@ namespace Singularidi.Tests.Midi
         [Test]
         public void Parse_SampleMid_ProducesNotes()
         {
-            string path = Path.Combine(Application.dataPath, "Midi", "Sample.mid");
+            string path = Path.Combine(Application.streamingAssetsPath, "Midi", "Sample.mid");
             if (!File.Exists(path))
                 Assert.Inconclusive($"Sample.mid not found at {path}");
 

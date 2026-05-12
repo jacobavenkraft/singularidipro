@@ -3,10 +3,13 @@
     "rootNamespace": "Singularidi.Tests",
     "references": [
         "Singularidi.Core",
+        "Singularidi.Unity",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

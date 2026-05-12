@@ -107,3 +107,10 @@ InitTestScene*.unity*
 
 # Claude context
 .claude/
+
+# SoundFonts are user-supplied via Assets/StreamingAssets/SoundFonts/.
+# See README.md in that folder for setup. Do not commit .sf2 binaries
+# (large, often non-redistributable). LFS-track a specific file if the
+# team needs to share one.
+*.sf2
+*.sf2.meta
